@@ -1,0 +1,204 @@
+
+#make sequence of images
+prefix="cuteanimals.";
+for i in $(seq 1 4000)
+do
+echo 'processing: /tmp/$prefix$1.jpg'
+cat /tmp/$prefix$i.jpg | docker run -i deepdream-cli -i 5 > /tmp/DREAM$prefix$i.jpg;
+done
+
+
+#transfer files into
+docker-machine scp default:/tmp/*.mp4 .
+
+#install ffmpeg on docker machine
+docker pull jrottenberg/ffmpeg
+
+
+#run ffmpeg command on docker machine
+docker run jrottenberg/ffmpeg -stats  \
+        -i http://archive.org/download/thethreeagesbusterkeaton/Buster.Keaton.The.Three.Ages.ogv \
+        -loop 0  \
+        -final_delay 500 -c:v gif -f gif -ss 00:49:42 -t 5 - > trow_ball.gif
+
+
+#make movie out of frames
+rm -f /tmp/list.txt;
+filename="DREAMcuteanimals.";
+dockerpr="/home/test"
+prefix="$dockerpr/$filename";
+for i in $(seq 1 100) ;
+  do name=`echo $i | cut -d'.' -f1`;
+  echo "file '$prefix$name.jpg'">>/tmp/list.txt;
+  echo "file '$prefix$name.jpg'"
+  #ffmpeg -i $i $name.mov;
+done;
+cat /tmp/list.txt;
+docker run -v /tmp:$dockerpr jrottenberg/ffmpeg -r 15 -y -safe 0 -f concat -i $dockerpr/list.txt -crf 0 -f mp4 -r 15 $dockerpr/$filename.mp4
+
+
+#docker install deep-dream notebook
+git clone https://github.com/saturnism/deepdream-docker
+cd deepdream-docker
+docker build -t deepdream .
+
+#run notebook
+docker run -p 8888:8888 -v /tmp:/deepdream/deepdream/files -ti deepdream
+
+#docker install deep dream cli
+git clone https://github.com/saturnism/deepdream-cli-docker.git
+cd deepdream-cli-docker
+docker build -t deepdream-cli .
+
+#docker run cli
+cat moon.jpg | docker run -i deepdream-cli > output.jpg
+cat myimage.jpg | docker run -i deepdream-cli -l conv2/3x3 -o 6 > output.jpg
+
+
+
+
+
+
+docker cp containerid:/deepdream/deepdream/frames ~/
+ffmpeg -framerate 30 -pattern_type glob -i '*.jpg' -c:v libx264 -r 30 -pix_fmt yuv420p out.mp4
+docker run deepdream-cli -h
+
+
+for f in *.jpg; \
+  do { cat $f | docker run -i deepdream-cli > out_$f; } & \
+done;
+
+
+ docker run deepdream-cli -h
+
+#  -i ITERATIONS, --iterations=ITERATIONS
+#                        Iterations
+#  -o OCTAVES, --octaves=OCTAVES
+#                        Octatves
+#  -s SCALE, --scale=SCALE
+#                        Octatves Scale
+#  -l LAYER, --layer=LAYER
+#                       Layer
+
+#layers list
+'data',
+ 'conv1/7x7_s2',
+ 'pool1/3x3_s2',
+ 'pool1/norm1',
+ 'conv2/3x3_reduce',
+ 'conv2/3x3',
+ 'conv2/norm2',
+ 'pool2/3x3_s2',
+ 'pool2/3x3_s2_pool2/3x3_s2_0_split_0',
+ 'pool2/3x3_s2_pool2/3x3_s2_0_split_1',
+ 'pool2/3x3_s2_pool2/3x3_s2_0_split_2',
+ 'pool2/3x3_s2_pool2/3x3_s2_0_split_3',
+ 'inception_3a/1x1',
+ 'inception_3a/3x3_reduce',
+ 'inception_3a/3x3',
+ 'inception_3a/5x5_reduce',
+ 'inception_3a/5x5',
+ 'inception_3a/pool',
+ 'inception_3a/pool_proj',
+ 'inception_3a/output',
+ 'inception_3a/output_inception_3a/output_0_split_0',
+ 'inception_3a/output_inception_3a/output_0_split_1',
+ 'inception_3a/output_inception_3a/output_0_split_2',
+ 'inception_3a/output_inception_3a/output_0_split_3',
+ 'inception_3b/1x1',
+ 'inception_3b/3x3_reduce',
+ 'inception_3b/3x3',
+ 'inception_3b/5x5_reduce',
+ 'inception_3b/5x5',
+ 'inception_3b/pool',
+ 'inception_3b/pool_proj',
+ 'inception_3b/output',
+ 'pool3/3x3_s2',
+ 'pool3/3x3_s2_pool3/3x3_s2_0_split_0',
+ 'pool3/3x3_s2_pool3/3x3_s2_0_split_1',
+ 'pool3/3x3_s2_pool3/3x3_s2_0_split_2',
+ 'pool3/3x3_s2_pool3/3x3_s2_0_split_3',
+ 'inception_4a/1x1',
+ 'inception_4a/3x3_reduce',
+ 'inception_4a/3x3',
+ 'inception_4a/5x5_reduce',
+ 'inception_4a/5x5',
+ 'inception_4a/pool',
+ 'inception_4a/pool_proj',
+ 'inception_4a/output',
+ 'inception_4a/output_inception_4a/output_0_split_0',
+ 'inception_4a/output_inception_4a/output_0_split_1',
+ 'inception_4a/output_inception_4a/output_0_split_2',
+ 'inception_4a/output_inception_4a/output_0_split_3',
+ 'inception_4b/1x1',
+ 'inception_4b/3x3_reduce',
+ 'inception_4b/3x3',
+ 'inception_4b/5x5_reduce',
+ 'inception_4b/5x5',
+ 'inception_4b/pool',
+ 'inception_4b/pool_proj',
+ 'inception_4b/output',
+ 'inception_4b/output_inception_4b/output_0_split_0',
+ 'inception_4b/output_inception_4b/output_0_split_1',
+ 'inception_4b/output_inception_4b/output_0_split_2',
+ 'inception_4b/output_inception_4b/output_0_split_3',
+ 'inception_4c/1x1',
+ 'inception_4c/3x3_reduce',
+ 'inception_4c/3x3',
+ 'inception_4c/5x5_reduce',
+ 'inception_4c/5x5',
+ 'inception_4c/pool',
+ 'inception_4c/pool_proj',
+ 'inception_4c/output',
+ 'inception_4c/output_inception_4c/output_0_split_0',
+ 'inception_4c/output_inception_4c/output_0_split_1',
+ 'inception_4c/output_inception_4c/output_0_split_2',
+ 'inception_4c/output_inception_4c/output_0_split_3',
+ 'inception_4d/1x1',
+ 'inception_4d/3x3_reduce',
+ 'inception_4d/3x3',
+ 'inception_4d/5x5_reduce',
+ 'inception_4d/5x5',
+ 'inception_4d/pool',
+ 'inception_4d/pool_proj',
+ 'inception_4d/output',
+ 'inception_4d/output_inception_4d/output_0_split_0',
+ 'inception_4d/output_inception_4d/output_0_split_1',
+ 'inception_4d/output_inception_4d/output_0_split_2',
+ 'inception_4d/output_inception_4d/output_0_split_3',
+ 'inception_4e/1x1',
+ 'inception_4e/3x3_reduce',
+ 'inception_4e/3x3',
+ 'inception_4e/5x5_reduce',
+ 'inception_4e/5x5',
+ 'inception_4e/pool',
+ 'inception_4e/pool_proj',
+ 'inception_4e/output',
+ 'pool4/3x3_s2',
+ 'pool4/3x3_s2_pool4/3x3_s2_0_split_0',
+ 'pool4/3x3_s2_pool4/3x3_s2_0_split_1',
+ 'pool4/3x3_s2_pool4/3x3_s2_0_split_2',
+ 'pool4/3x3_s2_pool4/3x3_s2_0_split_3',
+ 'inception_5a/1x1',
+ 'inception_5a/3x3_reduce',
+ 'inception_5a/3x3',
+ 'inception_5a/5x5_reduce',
+ 'inception_5a/5x5',
+ 'inception_5a/pool',
+ 'inception_5a/pool_proj',
+ 'inception_5a/output',
+ 'inception_5a/output_inception_5a/output_0_split_0',
+ 'inception_5a/output_inception_5a/output_0_split_1',
+ 'inception_5a/output_inception_5a/output_0_split_2',
+ 'inception_5a/output_inception_5a/output_0_split_3',
+ 'inception_5b/1x1',
+ 'inception_5b/3x3_reduce',
+ 'inception_5b/3x3',
+ 'inception_5b/5x5_reduce',
+ 'inception_5b/5x5',
+ 'inception_5b/pool',
+ 'inception_5b/pool_proj',
+ 'inception_5b/output',
+ 'pool5/7x7_s1',
+ 'loss3/classifier',
+ 'prob'

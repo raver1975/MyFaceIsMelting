@@ -49,6 +49,7 @@ public class Main {
     public Main(String file, int width, int height) throws Exception {
         sf.setAmount(10f);
         sf.setTurbulence(1f);
+        sf.setScale(100);
         sf.setEdgeAction(sf.CLAMP);
         sf1.setEdgeAction(sf1.CLAMP);
         sf1.setAmount(20f);
@@ -60,6 +61,7 @@ public class Main {
 
         FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(file);
         grabber.start();
+        if (file.endsWith(".mp4")) file = file.substring(0, file.length() - 4);
         int frameLength = grabber.getLengthInFrames();
 
         int cnt = 0;
@@ -70,14 +72,14 @@ public class Main {
             IplImage image = new OpenCVFrameConverter.ToIplImage().convert(grab);
 
             IplImage gray = create(image.cvSize(), IPL_DEPTH_8U, 1);
-            IplImage edges = create(gray.cvSize(), gray.depth(), gray.nChannels());
+            //IplImage edges = create(gray.cvSize(), gray.depth(), gray.nChannels());
             IplImage temp12 = create(image.cvSize(), image.depth(), image.nChannels());
             IplImage pp8 = render(copy(image), sf);
             IplImage copy11 = render(copy(pp8), sf1);
             cvCvtColor(copy11, gray, CV_BGR2GRAY);
             cvSmooth(gray, gray, CV_MEDIAN, MEDIAN_BLUR_FILTER_SIZE, 0, 0, 0);
-            cvLaplace(gray, edges, LAPLACIAN_FILTER_SIZE);
-            cvThreshold(edges, edges, 80, 255, CV_THRESH_BINARY_INV);
+           // cvLaplace(gray, edges, LAPLACIAN_FILTER_SIZE);
+           // cvThreshold(edges, edges, 80, 255, CV_THRESH_BINARY_INV);
             temp12 = create(copy11.cvSize(), copy11.depth(), copy11.nChannels());
             for (int i = 0; i < repetitions; i++) {
                 cvSmooth(copy11, temp12, CV_BILATERAL, ksize, 0, sigmaColor, sigmaSpace);
@@ -87,15 +89,15 @@ public class Main {
             temp12 = create(copy11.cvSize(), copy11.depth(), copy11.nChannels());
             cvZero(temp12);
 //
-            cvCopy(copy11, temp12, edges);
+            cvCopy(copy11, temp12,null);
+//            cvCopy(copy11, temp12,edges);
             sf.setTime(t1 += .07f);
             sf1.setTime(t2 += .05f);
 
             BufferedImage bi = new Java2DFrameConverter().convert(new OpenCVFrameConverter.ToIplImage().convert(copy(temp12)));
             BufferedImage biScaled = resizeImage(bi, width, height);
-            String imageFile = file + "." + cnt + ".png";
-            String outImageFile = file + "." + "DREAM." + cnt + ".png";
-            ImageIO.write(bi, "png", new File(imageFile));
+            String imageFile = file + "." + cnt + ".jpg";
+            ImageIO.write(resizeImage(bi, width, height), "jpg", new File(imageFile));
             cf.showImage(new Java2DFrameConverter().convert(biScaled));
 /*            try {
                 Process proc = new ProcessBuilder("cat " + imageFile + " | docker run -i deepdream-cli > " + outImageFile).start();
@@ -129,6 +131,7 @@ public class Main {
 //            image.release();
             cnt++;
         }
+        System.exit(0);
     }
 
     public static IplImage copy(IplImage image) {
@@ -161,13 +164,12 @@ public class Main {
         return resizedImage;
     }
 
-    public static void main(String[] args) {
-        if (args.length > 2) {
-            try {
+    public static void main(String[] args) throws Exception {
+        if (args.length==0){
+            new Main("cuteanimals.mp4",960,520);
+        }
+        if (args.length == 3) {
                 new Main(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }
