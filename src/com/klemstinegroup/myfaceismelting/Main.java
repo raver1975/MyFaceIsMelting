@@ -1,10 +1,7 @@
 package com.klemstinegroup.myfaceismelting;
 
 import com.jhlabs.image.AbstractBufferedImageOp;
-import com.jhlabs.image.GrayscaleFilter;
-import com.jhlabs.image.LaplaceFilter;
 import com.jhlabs.image.SwimFilter;
-import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.IplImage;
 import org.bytedeco.javacv.*;
 import org.bytedeco.javacv.Frame;
@@ -14,7 +11,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static java.awt.Color.gray;
@@ -101,26 +97,30 @@ public class Main {
             String outImageFile = file + "." + "DREAM." + cnt + ".png";
             ImageIO.write(bi, "png", new File(imageFile));
             cf.showImage(new Java2DFrameConverter().convert(biScaled));
-            Process proc = new ProcessBuilder("cat " + imageFile + " | docker run -i deepdream-cli > " + outImageFile).start();
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(proc.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(proc.getErrorStream()));
+/*            try {
+                Process proc = new ProcessBuilder("cat " + imageFile + " | docker run -i deepdream-cli > " + outImageFile).start();
+                BufferedReader stdInput = new BufferedReader(new
+                        InputStreamReader(proc.getInputStream()));
+                BufferedReader stdError = new BufferedReader(new
+                        InputStreamReader(proc.getErrorStream()));
 
 // read the output from the command
-            System.out.println("Here is the standard output of the command:\n");
-            String s = null;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
+                System.out.println("Here is the standard output of the command:\n");
+                String s = null;
+                while ((s = stdInput.readLine()) != null) {
+                    System.out.println(s);
+                }
 
 // read any errors from the attempted command
-            System.out.println("Here is the standard error of the command (if any):\n");
-            while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+                System.out.println("Here is the standard error of the command (if any):\n");
+                while ((s = stdError.readLine()) != null) {
+                    System.out.println(s);
+                }
+                proc.waitFor();
+                System.out.println("I dreamed a dream: " + outImageFile);
+
             }
-            proc.waitFor();
-            System.out.println("wrote: "+outImageFile);
+            catch (Exception e){e.printStackTrace();}*/
 //            copy11.release();
 //            gray.release();
 //            edges.release();

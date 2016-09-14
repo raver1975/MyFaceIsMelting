@@ -27,4 +27,9 @@ dependencies {
     compile group: 'org.bytedeco', name: 'javacpp', version: '1.2'
     compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.1.0-1.2', classifier: 'windows-x86_64'
     compile group: 'org.bytedeco.javacpp-presets', name: 'ffmpeg', version: '3.1.2-1.2', classifier: 'windows-x86_64'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.1.0-1.2', classifier: 'linux-x86_64'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'ffmpeg', version: '3.1.2-1.2', classifier: 'linux-x86_64'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.1.0-1.2'
+    compile group: 'org.bytedeco.javacpp-presets', name: 'ffmpeg', version: '3.1.2-1.2'
+
 }
