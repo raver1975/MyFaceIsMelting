@@ -1,11 +1,14 @@
 
+
+#===========================================================================================================
 #make sequence of images
 prefix="cuteanimals.";
-for i in $(seq 1 4000)
+for i in $(seq 7001 11000)
 do
 echo 'processing: /tmp/$prefix$1.jpg'
 cat /tmp/$prefix$i.jpg | docker run -i deepdream-cli -i 5 > /tmp/DREAM$prefix$i.jpg;
 done
+#===========================================================================================================
 
 
 #transfer files into
@@ -22,20 +25,26 @@ docker run jrottenberg/ffmpeg -stats  \
         -final_delay 500 -c:v gif -f gif -ss 00:49:42 -t 5 - > trow_ball.gif
 
 
+#===========================================================================================================
+docker-machine ssh default
+
 #make movie out of frames
 rm -f /tmp/list.txt;
 filename="DREAMcuteanimals.";
 dockerpr="/home/test"
 prefix="$dockerpr/$filename";
-for i in $(seq 1 100) ;
+outfix="LION";
+for i in $(seq 3184 3684) ;
   do name=`echo $i | cut -d'.' -f1`;
   echo "file '$prefix$name.jpg'">>/tmp/list.txt;
   echo "file '$prefix$name.jpg'"
   #ffmpeg -i $i $name.mov;
 done;
 cat /tmp/list.txt;
-docker run -v /tmp:$dockerpr jrottenberg/ffmpeg -r 15 -y -safe 0 -f concat -i $dockerpr/list.txt -crf 0 -f mp4 -r 15 $dockerpr/$filename.mp4
+docker run -v /tmp:$dockerpr jrottenberg/ffmpeg -y -r 10 -safe 0 -f concat -i $dockerpr/list.txt -crf 5 -f mp4 $dockerpr/${filename}${outfix}.mp4
+echo "docker-machine scp /tmp/${filename}${outfix}.mp4 ."
 
+#===========================================================================================================
 
 #docker install deep-dream notebook
 git clone https://github.com/saturnism/deepdream-docker
