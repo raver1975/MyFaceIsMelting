@@ -34,7 +34,7 @@ filename="DREAMcuteanimals.";
 dockerpr="/home/test"
 prefix="$dockerpr/$filename";
 outfix="LION";
-for i in $(seq 3184 3684) ;
+for i in $(seq 1780 2557) ;
   do name=`echo $i | cut -d'.' -f1`;
   echo "file '$prefix$name.jpg'">>/tmp/list.txt;
   echo "file '$prefix$name.jpg'"
@@ -42,7 +42,7 @@ for i in $(seq 3184 3684) ;
 done;
 cat /tmp/list.txt;
 docker run -v /tmp:$dockerpr jrottenberg/ffmpeg -y -r 10 -safe 0 -f concat -i $dockerpr/list.txt -crf 5 -f mp4 $dockerpr/${filename}${outfix}.mp4
-echo "docker-machine scp /tmp/${filename}${outfix}.mp4 ."
+echo "docker-machine scp default:/tmp/${filename}${outfix}.mp4 ."
 
 #===========================================================================================================
 
